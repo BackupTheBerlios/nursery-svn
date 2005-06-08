@@ -1,0 +1,11 @@
+This is a list of some "best practices" that I (jcroisant) think
+should be kept in mind over the course of this project.
+
+- Have modest goals. Once those are achieved, create further goals.
+- At the end of every day, the game should be playable in some form.
+- Each part controls its own interface -- outside code does not
+  impose a specific structure on it. Of course, you can ask nicely
+  for it to be changed...
+
+Add others as you see fit.
+----
