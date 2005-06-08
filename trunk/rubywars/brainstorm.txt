@@ -1,0 +1,90 @@
+Rubywars Summary
+================
+
+'Rubywars' (working title) will be a 2D space shooter ala Asteroids or 
+Star Control. The main focus, what makes it unique, is modular and user-
+customizable weaponry.
+
+Brainstorming
+=============
+
+Modularity
+----------
+	- 'Drag-and-drop' interface for building up intricate combinations
+	  of components. e.g. "drag an 'orbitoid' to your ship, then drag a
+  	  laser cannon on the orbitoid. The result would be a little thing
+  	  that spins around your ship and shoots lasers"
+	- Simple tree model with branches of nodes, with the ship as base.
+	  e.g.:
+	                    _ missile
+	        _ orbitoid-|
+	  ship-|           |_ laser
+           |_ laser
+	       |
+	       |_ shield
+
+  	- This combining would happen in some sort of docking bay, separate 
+	  from the space-shooting action.
+	- Each component has a cost associated with it, so more intricate
+	  combinations of components would be more expensive.
+	- Maybe some set limit to the number of layers or total slots allowed.
+	- "Cut" and "Paste" tree branches from one part to another.
+		
+Customizability
+---------------
+	- Players who can program can create new components with Ruby code.
+	- Players who can't program should also have some degree of
+	  customization.
+	- Checklist of features for component: "splash damage?", "homing?",
+	  etc.to put together semi-new components from sub-components.
+
+Salvage
+-------
+	- Pick up components from destroyed enemy ships, which can later
+	  be attached to your ship in the hangar.
+	- Or, pick up designs from destroyed enemy ships, and then you can
+	  buy more of that type of component from the hangar.
+
+Multiplayer
+-----------
+	- Transfer custom components and weapon combinations to other players
+	  over the internet automatically.
+	- Also allow players to download weapons from web sites.
+	- Allow players to approve/disapprove custom weapons, e.g. weapons they
+	  think are 'lame' or 'cheap'
+	- Weapons can be grouped into 'packages' which can be approved as a
+	  whole, or only part. e.g. an 'official' package with the defailt
+	  weapons.
+	- Allow players to agree on the costs of components, or allow host
+	  player to decide the costs.
+	- Set limits for points spent on equipment, for all players, but also
+	  allow handicaps.
+
+Weapons
+-------
+	- Some weapons take ammo (e.g. missiles), some don't (e.g. lasers),
+	  so you can have a backup weapon in case you run out of ammo.
+	- Ammo can be bought before the battle, or scavenged from enemies.
+	- Buying ammo uses part of your point budget.
+
+Energy
+------
+	- Ship provides energy at a certain rate.
+	- Components use energy all the time, effectively reducing the rate
+	  the ship can provide it.
+	- Unconsumed energy fills up an energy bar, which is used for actions,
+	  e.g. firing a weapon or accelerating
+	- So, if you overload your ship with equipment, your energy bar will
+	  not recharge very quickly.
+	- Players must strike a balance between consumption and production of
+	  energy (this balance will vary between players)
+
+Arcade Mode
+-----------
+	- Pick up components dropped from enemies.
+	- One idea: components go to a storage bay, and the player can swap them
+	  around as he chooses (either while paused or while still playing)
+	- Better idea: limited number of slots, allow player to select which slot
+	  should be swapped out to make room for a new component.
+	- Maybe allow a "Don't swap" option if the player doesn't want to swap
+	  any (i.e. he likes his equipment as-is).
