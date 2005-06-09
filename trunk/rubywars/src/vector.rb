@@ -10,11 +10,20 @@ HALF_PI = PI*0.5
 THREE_HALF_PI = PI*1.5
 TWO_PI = PI*2
 
-# A 2D vector class with some potentially useful properties:
+# A 2D vector class with some potentially useful (but perhaps
+# initially surprising) properties:
 #   Vector(a,b) + Vector(c,d) = Vector(a+c,b+d)
 #   Vector(a,b) + n = Vector(a+n,b+n)
 # 
-# (It works the same way with subraction, multiplication, and division.)
+# It works the same way with subraction, multiplication, and division.
+#
+# (I know this isn't how "real" vectors work, but it was a trade-off
+# between being proper and being useful. I chose useful. Whether it
+# should throw up an error message when you tried to add a scalar to a
+# vector or have some perhaps-useful behavior was a judgement call, and
+# might change in the future. Multiplying vectors together to apply
+# component-specific scalars is just too useful to take out, so don't
+# even ask.)
 # 
 # Vector is used for storing 2D coordinates +(x,y)+ as well as
 # vectors such as velocity or acceleration (representationally,
@@ -34,7 +43,7 @@ TWO_PI = PI*2
 # given as seperate arguments, or as an Array (or Vector).
 # Isn't that super-convenient?
 # 
-# This version is meant to save processing time by storing extra
+# This version is meant to save processing time by remembering extra
 # properties (angle, magnitude, etc.) whenever they are calculated,
 # so that they only need to be calculated once. If the vector
 # changes, the properties will be calculated again next time they
