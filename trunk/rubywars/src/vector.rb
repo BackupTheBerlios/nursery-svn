@@ -53,7 +53,7 @@ class Vector
 		if y
 			@x, @y = x, y
 		else
-			@x, @y = *x
+			@x, @y = x[0..1]
 		end
 	end
 
@@ -63,7 +63,7 @@ class Vector
 		if m
 			v.a, v.m = a, m
 		else
-			v.a, v.m = *a
+			v.a, v.m = a[0..1]
 		end
 		return v
 	end
@@ -97,7 +97,7 @@ class Vector
 	end
 
 	def /(other)
-		x,y = @x.to_f,@y.to_f
+		x, y = @x.to_f, @y.to_f
 		if other.kind_of? Numeric
 			return self.class.new(x/other,y/other)
 		else
@@ -125,18 +125,18 @@ class Vector
 
 	# Modify the x and y components of the Vector in-place
 	def set!(x,y=nil)
-		if y or (x.is_a? Array)
-			@x, @y = *x
-		else
+		if y
 			@x, @y = x, y
+		else
+			@x, @y = x[0..1]
 		end
 		cleanUp()
 	end
 
 	# Modify the angle and magnitude of the Vector in-place
 	def set_am!(a,m=nil)
-		if m or (a.is_a? Array)
-			self.a, self.m = *a
+		if m
+			self.a, self.m = a[0..1]
 		else
 			self.a, self.m = a, m
 		end
