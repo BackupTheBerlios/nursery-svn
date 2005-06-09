@@ -88,3 +88,20 @@ Arcade Mode
 	  should be swapped out to make room for a new component.
 	- Maybe allow a "Don't swap" option if the player doesn't want to swap
 	  any (i.e. he likes his equipment as-is).
+
+Map Edges
+---------
+	- When ship reaches the edge of the map, what happens?
+	  - Wraps around to other side?
+		- Unrealistic, but useful for multiplayer
+	  - Bounces off/stops
+		- Unrealistic, pretty lame solution. But acceptable for arcade mode.
+	  - Space goes on forever (nothing but you and the stars...)
+		- Realistic, in multiplayer you could just fly away from your
+		  opponent forever if you had a faster ship and were a llama.
+	  - Some sort of dangerous barrier, like an asteroid belt
+		- Plausible... an elegant solution!
+	- Behavior can vary between game modes. Suggest:
+	  - Arcade mode = edge of screen is impenetrable barrier
+	  - Single player mode = Endless space / Asteroid belt
+	  - Multi-player mode = Wrap-around / Asteroid belt
