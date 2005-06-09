@@ -49,20 +49,21 @@ class Ship
 	def initialize(image, pos, vel, angle, accel, spin)
 		super()
 		@base_image = image
-		@pos = pos
-		@vel = vel
+		@pos = Vector.new(pos)
+		@vel = Vector.new(vel)
 		@angle = angle
 		@old_angle = angle
 		@accel = accel			# reference acceleration vector
 		@a = Vector.new(0,0)	# the direction it _is_ accelerating
-		@spin = spin			# how fast it can rotate
+		@spin = spin			# how fast it CAN rotate
 		@avel = 0				# angular vel (how fast it IS rotating)
 		
 		@t = 0
 		self.stamp				# set initial position and velocity
 
 		@image = image
-		@rect = Rubygame::Rect.new( @pos.to_a + @image.size)
+		@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
+		@rect.center = @pos.x.to_i, @pos.y.to_i
 	end
 
 	# Set the "initial" position and velocity to current values.
@@ -71,7 +72,7 @@ class Ship
 	def stamp
 		now = Rubygame::Time.get_ticks()
 		t = now - @t
-		@pos.x, @pos.y = project(t)
+		@pos.set!(project(t))
 		@t = now
 	end
 
@@ -84,8 +85,8 @@ class Ship
 	# and t = time since init.)
 	def project(t)
 		t2 = t*t/2 # one half t-squared
-		Vector.new(@pos.x + @vel.x*t + @a.x*t2,
-				   @pos.y + @vel.y*t + @a.y*t2)
+		return Vector.new(@pos.x + @vel.x*t + @a.x*t2,
+						  @pos.y + @vel.y*t + @a.y*t2)
 	end
 
 	# Update object's position and angle
@@ -101,6 +102,8 @@ class Ship
 		@angle += @avel * t
 		unless @angle == @old_angle
 			@image = Rubygame::Transform.rotozoom(@base_image,@angle,1)
+			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
+			@rect.center = @pos.x.to_i, @pos.y.to_i
 		end
 		@old_angle = @angle
 
@@ -109,15 +112,17 @@ class Ship
 	end
 
 	# Begin rotating counter-clockwise. Because positive Y value are "down" 
-	# for SDL, this means we DECREASE the angle to go counter-clockwise.
+	# for SDL, this means we DECREASE the angle to go counter-clockwise??
+	# I guess not?
 	def start_rotate_left
-		@avel = -@spin
+		@avel = @spin
 	end
 
 	# Begin rotating clockwise. Because positive Y value are "down" for SDL,
-	# this means we INCREASE the angle to go clockwise.
+	# this means we INCREASE the angle to go clockwise??
+	# I guess not?
 	def start_rotate_right
-		@avel = @spin
+		@avel = -@spin
 	end
 
 	# Stop rotating.
@@ -132,6 +137,6 @@ class Ship
 
 	# Stop accelerating from thrusters.
 	def stop_thrust
-		@a = [0,0]
+		@a.set!(0,0)
 	end
 end
