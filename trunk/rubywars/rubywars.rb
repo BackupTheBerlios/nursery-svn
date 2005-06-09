@@ -21,16 +21,25 @@ def main
 	$screen.set_caption("Rubywars")
 	$queue = Rubygame::Queue.instance()
 	$clock = Rubygame::Time::Clock.new()
+	$clock.desired_fps = 50
 
 	$image = Rubygame::Surface.new([100,100])
-	Rubygame::Draw.polygon($image,[[0,0],[100,50],[0,100],[0,0]],[150,150,150])
+	# Grey body
+	Rubygame::Draw.filled_polygon($image,
+								  [[0,0],[100,50],[0,100],[0,0]],
+								  [150,150,150])
+	# White tip
+	Rubygame::Draw.filled_polygon($image,
+								  [[75,42],[92,50],[75,58],[75,42]],
+								  [250,250,250])
+
 
 	$ship = Ship.new($image, 		# surface
 					 Vector.new(320,240), # pos
 					 Vector.new(1,0), # vel
 					 0,				# angle
-					 Vector.new(0.1,0),	# accel
-					 0.1)			# spin
+					 Vector.new(1,0),	# accel
+					 0.5)			# spin
 
 # Basic overview of (finished) game loop:
 #   - Each object checks if armor < 1. If so, it dies.
@@ -45,6 +54,8 @@ def main
 
 # Overview of CURRENT game loop:
 #   - Check for player input (and quit on Q, Escape, or Close)
+#   - Update object locations
+#   - Redraw/update relevant parts of screen
 	catch(:quit) do
 		loop do
 			$queue.get.each do |event|
@@ -52,13 +63,42 @@ def main
 				case event
 				when Rubygame::QuitEvent
 					throw :quit
-				when Rubygame::KeyDownEvent
+				when Rubygame::KeyDownEvent	# key is pressed
 					case event.key
 					when Rubygame::K_Q, Rubygame::K_ESCAPE
 						throw :quit
+					when Rubygame::K_LEFT
+						$ship.start_rotate_left()
+					when Rubygame::K_RIGHT
+						$ship.start_rotate_right()
+					when Rubygame::K_UP
+						$ship.start_thrust()
+					end
+				when Rubygame::KeyUpEvent # key is released
+					case event.key
+					when Rubygame::K_LEFT
+						$ship.stop_rotate()
+					when Rubygame::K_RIGHT
+						$ship.stop_rotate()
+					when Rubygame::K_UP
+						$ship.stop_thrust()
 					end
 				end				# end case event
-			end					# end get
+			end					# end each
+
+			# Update ship's position. The value of $clock.tick is
+			# actually ignored by the ship (in this case), but it has the
+			# side-effect of delaying execution.
+
+			$ship.update($clock.tick())
+
+			# Draw the ship to the screen. It will leave a 'tail' for now.
+			$ship.draw($screen)
+
+			# Refresh the display window.
+			$screen.update()
+			
+
 		end						# end loop
 	end							# end catch
 		
