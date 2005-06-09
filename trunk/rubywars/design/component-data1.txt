@@ -1,0 +1,54 @@
+Component data format
+=====================
+
+Component identification data
+-----------------------------
+
+	- name: a technical, spaceless name, possibly its filename
+	  ex: orbilauncherA4, plasmacannon09
+	- prettyName: the name of the component as it is listed in game windows
+	  ex: "OrbiLauncher Mark IV", "Plasma Cannon SP/EX"
+	  -> Possibility that the game generates these names?
+	- description: a player-provided description of the weapon
+	- filehash: an identifying characteristic computed by the program that
+	  marks this version as "unique." If Player A and Player B are playing
+	  a multiplayer game and they both have weapons with the same filename,
+	  the joining player's file is checked against the hosting player's file.
+	  He will only be able to play if the files match. If they don't match,
+	  he can download a new version or leave the game.
+
+Component metadata
+------------------
+
+	- author: the user provides his name as the author of this file
+	- version: the current numerical version of this weapon, as provided by the
+	  user
+	- authorEmail: if the user provides an email address, that can be viewed
+	  easily
+	- authorAbout: ...as can a short bio of the author, or a website, or some
+	  other identifying characteristic
+
+Component attribute data 
+------------------------
+	- attributes: a list of the particular attributes that this component has,
+	  or a set of binary digits that trigger certain attributes. For example,
+	  a component may be an orbiting sphere; it may fire laser shots or plasma
+	  shots when fired; it may require ammunition
+
+Component technical data:
+------------------------
+
+	- power: this is used to compute the overall "power" of a component, which
+	  is interpreted differently depending on the attributes provided. Power
+	  specifies the damage caused by a weapon, the factor by which an engine
+	  upgrade increases speed, or the extra protection provided by a shield or
+	  armor upgrade
+	- rateOfFire: components that fire projectiles consider this value to
+	  determine how often the projectiles are sent along. For components that
+	  are always on this value is 0
+	- ammoSizeFactor: different ammunition requires different amounts of
+	  payload space; machine gun rounds require less space than large bombs.
+	  Rubywars considers the size factor of ammunition when calculating how
+	  much ammo you can fit into your ship on a particular mission. Larger
+	  values require more space. Components that do not use ammunition set
+	  this value to 0
