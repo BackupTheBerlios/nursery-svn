@@ -12,6 +12,10 @@ require 'src/ship'
 
 Rubygame.init()
 
+class UpdateGroup < Rubygame::Sprite::Group
+	include Rubygame::Sprite::UpdateGroup
+end
+
 def main
 
 	# For now this is just a test, so we can do dirty stuff like
@@ -22,6 +26,8 @@ def main
 	$queue = Rubygame::Queue.instance()
 	$clock = Rubygame::Time::Clock.new()
 	$clock.desired_fps = 50
+
+	$background = Rubygame::Surface.new($screen.size).fill([0,0,0])
 
 	$image = Rubygame::Surface.new([100,100])
 	# Grey body
@@ -38,8 +44,12 @@ def main
 					 Vector.new(320,240), # pos
 					 Vector.new(1,0), # vel
 					 0,				# angle
-					 Vector.new(1,0),	# accel
-					 0.5)			# spin
+					 Vector.new(0.01,0),	# accel
+					 5)			# spin
+
+	$sprites = UpdateGroup.new()
+	$sprites.push($ship)
+											  
 
 # Basic overview of (finished) game loop:
 #   - Each object checks if armor < 1. If so, it dies.
@@ -86,17 +96,20 @@ def main
 				end				# end case event
 			end					# end each
 
+			$sprites.undraw($screen,$background)
+
 			# Update ship's position. The value of $clock.tick is
 			# actually ignored by the ship (in this case), but it has the
 			# side-effect of delaying execution.
 
-			$ship.update($clock.tick())
+			$sprites.update($clock.tick())
 
 			# Draw the ship to the screen. It will leave a 'tail' for now.
-			$ship.draw($screen)
+			$sprites.draw($screen)
 
 			# Refresh the display window.
 			$screen.update()
+			$screen.set_caption("Rubywars [#{$clock.fps} fps]")
 			
 
 		end						# end loop
