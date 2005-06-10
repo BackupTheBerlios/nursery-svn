@@ -66,12 +66,17 @@ class Ship
 		@rect.center = @pos.x.to_i, @pos.y.to_i
 	end
 
+	def draw(surf)
+		super
+		0.upto(10) do |t|
+	end
+
 	# Set the "initial" position and velocity to current values.
 	# This is called when the Ship's acceleration changes, or when the old
 	# position model is otherwise made obsolete. 
 	def stamp
 		now = Rubygame::Time.get_ticks()
-		t = now - @t
+		t = (now - @t)/1000
 		@pos.set!( project(t) )
 		@vel.set!( project_vel(t) )
 		@base_angle = @angle
@@ -110,9 +115,8 @@ class Ship
 
 		unless @avel == 0
 			@angle = @base_angle + @avel * t
-			@image = Rubygame::Transform.rotozoom(@base_image,@angle,1)
+			@image = Rubygame::Transform.rotozoom(@base_image,-@angle,1)
 			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
-			@rect.center = @pos.x.to_i, @pos.y.to_i
 		end
 
 		p = project(t).to_a
@@ -120,17 +124,15 @@ class Ship
 	end
 
 	# Begin rotating counter-clockwise. Because positive Y value are "down" 
-	# for SDL, this means we DECREASE the angle to go counter-clockwise??
-	# I guess not?
+	# for SDL, this means we DECREASE the angle to go counter-clockwise
 	def start_rotate_left
-		@avel = @spin
+		@avel = -@spin
 	end
 
 	# Begin rotating clockwise. Because positive Y value are "down" for SDL,
-	# this means we INCREASE the angle to go clockwise??
-	# I guess not?
+	# this means we INCREASE the angle to go clockwise
 	def start_rotate_right
-		@avel = -@spin
+		@avel = @spin
 	end
 
 	# Stop rotating.
