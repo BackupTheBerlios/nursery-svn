@@ -51,15 +51,15 @@ class Ship
 		@base_image = image
 		@pos = Vector.new(pos)
 		@vel = Vector.new(vel)
-		@angle = angle
-		@old_angle = angle
+		@angle = angle			# current angle
+		@base_angle = angle		# angle at last stamp()
 		@accel = accel			# reference acceleration vector
 		@a = Vector.new(0,0)	# the direction it _is_ accelerating
 		@spin = spin			# how fast it CAN rotate
 		@avel = 0				# angular vel (how fast it IS rotating)
 		
-		@t = 0
-		self.stamp				# set initial position and velocity
+		@t = Rubygame::Time.get_ticks()
+		stamp()					# set initial position and velocity
 
 		@image = image
 		@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
@@ -72,7 +72,9 @@ class Ship
 	def stamp
 		now = Rubygame::Time.get_ticks()
 		t = now - @t
-		@pos.set!(project(t))
+		@pos.set!( project(t) )
+		@vel.set!( project_vel(t) )
+		@base_angle = @angle
 		@t = now
 	end
 
@@ -89,26 +91,32 @@ class Ship
 						  @pos.y + @vel.y*t + @a.y*t2)
 	end
 
+	# Predict what the Ship's velocity will be +t+ milliseconds after 
+	# initialization,
+	def project_vel(t)
+		return Vector.new(@vel.x + @a.x*t,
+						  @vel.y + @a.y*t)
+	end
+
 	# Update object's position and angle
 	def update(dt)
 		# We totally ignore dt, which is for use with incremental models.
 		# Projection models (such as this one) are not distinguished from
-		# incremental models.
+		# incremental models when viewed from the outside.
 
 		now = Rubygame::Time.get_ticks()
 		t = now - @t			# how long since last stamp()
 		t = t / 1000			# convert to seconds
 
-		@angle += @avel * t
-		unless @angle == @old_angle
+		unless @avel == 0
+			@angle = @base_angle + @avel * t
 			@image = Rubygame::Transform.rotozoom(@base_image,@angle,1)
 			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
 			@rect.center = @pos.x.to_i, @pos.y.to_i
 		end
-		@old_angle = @angle
 
-		p = project(t)
-		@rect.center = p.x.to_i, p.y.to_i
+		p = project(t).to_a
+		@rect.center = p
 	end
 
 	# Begin rotating counter-clockwise. Because positive Y value are "down" 
@@ -132,11 +140,13 @@ class Ship
 
 	# Begin accelerating from thrusters.
 	def start_thrust
-		@a = @accel.rotate(@angle)
+		stamp()					# accel changes, so we must stamp
+		@a.set!(@accel.rotate(@angle))
 	end
 
 	# Stop accelerating from thrusters.
 	def stop_thrust
+		stamp()					# accel changes, so we must stamp
 		@a.set!(0,0)
 	end
 end
