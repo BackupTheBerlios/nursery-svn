@@ -66,10 +66,11 @@ class Ship
 		@rect.center = @pos.x.to_i, @pos.y.to_i
 	end
 
-	def draw(surf)
-		super
-		0.upto(10) do |t|
-	end
+#	def draw(surf)
+#		super
+#		0.upto(10) do |t|
+#			surf.fill([250-(t*15)]*3 # darkening grayscale
+#	end
 
 	# Set the "initial" position and velocity to current values.
 	# This is called when the Ship's acceleration changes, or when the old
