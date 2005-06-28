@@ -13,7 +13,7 @@ TWO_PI = PI*2
 # A 2D vector class with some potentially useful (but perhaps
 # initially surprising) properties:
 #   Vector(a,b) + Vector(c,d) = Vector(a+c,b+d)
-#   Vector(a,b) + n = Vector(a+n,b+n)
+#   Vector(a,b) + n = Vector(a,b) + Vector(n,n) = Vector(a+n, b+n)
 # 
 # It works the same way with subraction, multiplication, and division.
 #
@@ -90,11 +90,19 @@ class Vector
 	end
 
 	def +(other)
-		self.class.new(@x+other[0],@y+other[1])
+		if other.kind_of? Numeric
+			return self.class.new(@x+other,@y+other)
+		else
+			return self.class.new(@x+other[0],@y+other[1])
+		end
 	end
 
 	def -(other)
-		self.class.new(@x-other[0],@y-other[1])
+                if other.kind_of? Numeric
+                        return self.class.new(@x-other,@y-other)
+                else
+                        return self.class.new(@x-other[0],@y-other[1])
+                end
 	end
 
 	def *(other)
@@ -160,7 +168,7 @@ class Vector
 	def magnitude=(m)
 		new = self.normal * m
 		@x, @y = new.x, new.y
-		self.cleanUp
+		cleanUp
 	end
 	alias m magnitude
 	alias m= magnitude=
@@ -176,9 +184,9 @@ class Vector
 	def normal=(nx,ny=nil)
 		m = self.magnitude
 		if ny
-			n = Vector.new(n_or_nx,ny).normal
+			n = Vector.new(nx,ny).normal
 		elsif nx.is_a? Vector
-			n = n_or_nx.normal
+			n = nx.normal
 		else
 			n = Vector.new(n_or_nx).normal
 		end
@@ -205,7 +213,7 @@ class Vector
 
 	#Return the angle (radians) the vector forms with the positive X axis
 	def angle
-		@angle or @angle = Math.atan2(@x,@y)
+		@angle or @angle = Math.atan2(@y,@x)
 	end
 	#Set the angle (radians) of the vector from the positive X axis.
 	#Magnitude is preserved.
@@ -270,11 +278,11 @@ class Vector
 	private :cleanUp
 end
 
-# Calculate a vector connecting two points
+# Calculate a vector connecting two points. in particular the one from p1 to p2
 def vector_from_to(p1,p2)
 	begin
-		Vector(p1-p2)
+		return Vector.new(p2-p1)
 	rescue TypeError
-		Vector(p1[0]-p2[0],p1[1]-p2[1])
+		return Vector.new(p2[0]-p1[0],p2[1]-p1[1])
 	end
 end
