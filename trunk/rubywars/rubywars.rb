@@ -25,27 +25,28 @@ def main
 	$screen.set_caption("Rubywars")
 	$queue = Rubygame::Queue.instance()
 	$clock = Rubygame::Time::Clock.new()
-	$clock.desired_fps = 50
+#	$clock.desired_mspf = 1
 
-	$background = Rubygame::Surface.new($screen.size).fill([0,0,0])
+	$background = Rubygame::Surface.new($screen.size)
+	$background.fill([0,0,0])
 
-	$image = Rubygame::Surface.new([100,100])
+	$image = Rubygame::Surface.new([50,50])
 	# Grey body
 	Rubygame::Draw.filled_polygon($image,
-								  [[0,0],[100,50],[0,100],[0,0]],
+								  [[0,0],[50,25],[0,50],[0,0]],
 								  [150,150,150])
 	# White tip
 	Rubygame::Draw.filled_polygon($image,
-								  [[75,42],[92,50],[75,58],[75,42]],
+								  [[35,20],[45,25],[35,30],[35,20]],
 								  [250,250,250])
 
 
-	$ship = Ship.new($image, 		# surface
-					 Vector.new(320,240), # pos
-					 Vector.new(1,0), # vel
-					 0,				# angle
-					 Vector.new(0.01,0),	# accel
-					 5)			# spin
+	$ship = Ship.new($image,             # surface
+					Vector.new(320,240), # pos
+					Vector.new(0,0),     # vel
+					0,	                 # angle
+					Vector.new(1,0),     # accel
+					1)	                 # spin
 
 	$sprites = UpdateGroup.new()
 	$sprites.push($ship)
@@ -77,6 +78,8 @@ def main
 					case event.key
 					when Rubygame::K_Q, Rubygame::K_ESCAPE
 						throw :quit
+					when Rubygame::K_SPACE
+						$ship.report()
 					when Rubygame::K_LEFT
 						$ship.start_rotate_left()
 					when Rubygame::K_RIGHT
@@ -93,8 +96,8 @@ def main
 					when Rubygame::K_UP
 						$ship.stop_thrust()
 					end
-				end				# end case event
-			end					# end each
+				end             # end case event
+			end	                # end each
 
 			$sprites.undraw($screen,$background)
 
@@ -112,10 +115,10 @@ def main
 			$screen.set_caption("Rubywars [#{$clock.fps} fps]")
 			
 
-		end						# end loop
-	end							# end catch
-		
-end								# end def
+		end                     # end loop
+	end                         # end catch
+
+end                             # end def
 
 #this calls the 'main' function when this script is executed
 if $0 == __FILE__
