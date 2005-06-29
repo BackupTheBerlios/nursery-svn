@@ -15,6 +15,18 @@
 require 'src/vector'
 require 'rubygame'
 
+PI_OVER_ONE_EIGHTY = Math::PI/180
+ONE_EIGHTY_OVER_PI = 180/Math::PI
+
+def deg2rad(deg)
+	return deg * PI_OVER_ONE_EIGHTY
+end
+
+def rad2deg(rad)
+	return rad * ONE_EIGHTY_OVER_PI
+end
+
+
 class Ship
 	include Rubygame::Sprite::Sprite
 
@@ -129,7 +141,8 @@ class Ship
 
 		unless @avel == 0
 			@angle = @base_angle + @avel * t
-			@image = Rubygame::Transform.rotozoom(@base_image,-@angle,1)
+			angle = rad2deg(-@angle)
+			@image = Rubygame::Transform.rotozoom(@base_image,angle,1)
 			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
 		end
 
@@ -137,14 +150,12 @@ class Ship
 		@rect.center = p
 	end
 
-	# Begin rotating counter-clockwise. Because positive Y value are "down" 
-	# for SDL, this means we DECREASE the angle to go counter-clockwise
+	# Begin rotating counter-clockwise.
 	def start_rotate_left
 		@avel = -@spin
 	end
 
-	# Begin rotating clockwise. Because positive Y value are "down" for SDL,
-	# this means we INCREASE the angle to go clockwise
+	# Begin rotating clockwise.
 	def start_rotate_right
 		@avel = @spin
 	end
