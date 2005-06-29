@@ -68,7 +68,7 @@ class Vector
 
 	# Create a new Vector, specifying its angle (radians) and magnitude.
 	def self.new_am(a,m=nil)
-		v = Vector.new(0,0)
+		v = Vector.new(1,0)
 		if m
 			v.a, v.m = a, m
 		else
@@ -82,7 +82,15 @@ class Vector
 	end
 
 	def inspect
-		"#<#{self.class}: #{@x}, #{@y}>"
+		"#<#{self.class}:#{self.object_id}: #{@x}, #{@y}>"
+	end
+
+	def to_a
+		[@x,@y]
+	end
+
+	def ==(other)
+		self.to_a == other.to_a
 	end
 
 	def [](index)
@@ -120,10 +128,6 @@ class Vector
 		else
 			return self.class.new(x/other[0],y/other[1])
 		end
-	end
-
-	def to_a
-		[@x,@y]
 	end
 
 	def x=(v)
