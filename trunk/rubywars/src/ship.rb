@@ -13,6 +13,7 @@
 # Goal: A ship which can move and be steered with keyboard controls
 
 require 'src/vector'
+require 'rubygame'
 
 class Ship
 	include Rubygame::Sprite::Sprite
@@ -71,7 +72,7 @@ class Ship
 		0.upto(20) do |t|
 			v = project(t)
 			surf.fill([250-(t*10)]*3, # darkening grayscale
-					  [v.x-2, v.y-2, 4, 4]) # square around point
+					  [v.x-2, v.y-2, 2, 2]) # square around point
 		end
 	end
 
@@ -80,7 +81,7 @@ class Ship
 	# position model is otherwise made obsolete. 
 	def stamp
 		now = Rubygame::Time.get_ticks()
-		t = (now - @t)/1000
+		t = (now - @t)/1000.0
 		@pos.set!( project(t) )
 		@vel.set!( project_vel(t) )
 		@base_angle = @angle
@@ -100,6 +101,15 @@ class Ship
 						  @pos.y + @vel.y*t + @a.y*t2)
 	end
 
+	def report()
+		t = (Rubygame::Time.get_ticks() - @t)/1000.0
+		t2 = t*t/2 # one half t-squared
+		v = Vector.new(@pos.x + @vel.x*t + @a.x*t2,
+						  @pos.y + @vel.y*t + @a.y*t2)
+		puts "angle = #{@angle}"
+		puts "project: #{@pos} + #{@vel}*#{t} + #{@a}*#{t2} = #{v}"
+	end
+
 	# Predict what the Ship's velocity will be +t+ milliseconds after 
 	# initialization,
 	def project_vel(t)
@@ -115,7 +125,7 @@ class Ship
 
 		now = Rubygame::Time.get_ticks()
 		t = now - @t			# how long since last stamp()
-		t = t / 1000			# convert to seconds
+		t = t / 1000.0			# convert to seconds
 
 		unless @avel == 0
 			@angle = @base_angle + @avel * t
