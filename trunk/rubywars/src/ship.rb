@@ -69,7 +69,19 @@ class Ship
 		@accel = accel			# reference acceleration vector
 		@a = Vector.new(0,0)	# the direction it _is_ accelerating
 		@spin = spin			# how fast it CAN rotate
-		@avel = 0				# angular vel (how fast it IS rotating)
+
+		# Number of keys activating each thrust. We can't use true/false
+		# because two or more keys might be bound to one thruster.
+		# In such a case, releasing only one key should not stop thrust.
+		# 
+		# Value is incremented when the key is pressed, and decremented when
+		# released, so neutral should be zero. Anything greater than zero
+		# means "active", and anything lesser than zero is a bug!
+		@thrust = {
+			:aft => 0,		# causes forward motion.
+			:cw => 0,		# causes clockwise rotation.
+			:acw => 0,		# causes anti-clockwise rotation.
+		}
 		
 		@t = Rubygame::Time.get_ticks()
 		stamp()					# set initial position and velocity
@@ -113,6 +125,8 @@ class Ship
 						  @pos.y + @vel.y*t + @a.y*t2)
 	end
 
+	# Print the ship's angle and the formula being used to project
+	# position. For debugging purposes and curious people.
 	def report()
 		t = (Rubygame::Time.get_ticks() - @t)/1000.0
 		t2 = t*t/2 # one half t-squared
@@ -122,11 +136,41 @@ class Ship
 		puts "project: #{@pos} + #{@vel}*#{t} + #{@a}*#{t2} = #{v}"
 	end
 
+	# Recalculate the angle of acceleration of the ship, e.g. when
+	# the ship rotates.
+	def recalc_accel()
+		stamp()
+		if @thrust[:aft] > 0
+			@a.set!(@accel.rotate(@angle))
+		else
+			@a.set!(0,0)
+		end
+	end
+
 	# Predict what the Ship's velocity will be +t+ milliseconds after 
 	# initialization,
 	def project_vel(t)
 		return Vector.new(@vel.x + @a.x*t,
 						  @vel.y + @a.y*t)
+	end
+
+	# Returns true if the ship is rotating in either direction.
+	def spinning?()
+		(@thrust[:cw] > 0)  ^  (@thrust[:acw] > 0)
+		# I don't know if it's proper to use bitwise operators on booleans,
+		# but it works, and I need an XOR operator.
+	end
+
+	# Returns the net rotation effect on the ship, of the following:
+	#   0 (no rotation, e.g. neither or both rotationary thrusters active)
+	#   1 (clockwise rotation)
+	#  -1 (anti-clockwise rotation)
+	def net_spin()
+		if @thrust[:cw] > 0
+			@thrust[:acw] > 0  ?  0  :  1
+		else
+			@thrust[:acw] > 0  ?  -1  :  0
+		end
 	end
 
 	# Update object's position and angle
@@ -139,14 +183,15 @@ class Ship
 		t = now - @t			# how long since last stamp()
 		t = t / 1000.0			# convert to seconds
 
-		unless @avel == 0
+		if spinning?()
+			@angle = @base_angle + @spin * net_spin() * t
+
 			unless @a == [0,0]
-				@a.set!(@accel.rotate(@angle))
-				stamp()
+				recalc_accel()
 			end
-			@angle = @base_angle + @avel * t
-			angle = rad2deg(-@angle)
-			@image = Rubygame::Transform.rotozoom(@base_image,angle,1)
+
+			degrees = rad2deg(-@angle)
+			@image = Rubygame::Transform.rotozoom(@base_image,degrees,1)
 			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
 		end
 
@@ -154,30 +199,36 @@ class Ship
 		@rect.center = p
 	end
 
-	# Begin rotating counter-clockwise.
-	def start_rotate_left
-		@avel = -@spin
+	# Begin rotating anti-clockwise.
+	def start_thrust_acw
+		@thrust[:acw] += 1
 	end
 
 	# Begin rotating clockwise.
-	def start_rotate_right
-		@avel = @spin
+	def start_thrust_cw
+		@thrust[:cw] += 1
 	end
 
-	# Stop rotating.
-	def stop_rotate
-		@avel = 0
+	# Stop rotating anti-clockwise.
+	def stop_thrust_acw
+		@thrust[:acw] -= 1 unless @thrust[:acw] < 1
 	end
 
-	# Begin accelerating from thrusters.
-	def start_thrust
-		stamp()					# accel changes, so we must stamp
-		@a.set!(@accel.rotate(@angle))
+	# Stop rotating clockwise.
+	def stop_thrust_cw
+		@thrust[:cw] -= 1 unless @thrust[:cw] < 1
 	end
 
-	# Stop accelerating from thrusters.
-	def stop_thrust
-		stamp()					# accel changes, so we must stamp
-		@a.set!(0,0)
+
+	# Begin accelerating forward from aft thrusters.
+	def start_thrust_aft
+		@thrust[:aft] += 1
+		recalc_accel()
+	end
+
+	# Stop accelerating forward from aft thrusters.
+	def stop_thrust_aft
+		@thrust[:aft] -= 1 unless @thrust[:aft] < 1
+		recalc_accel()
 	end
 end

@@ -45,7 +45,7 @@ def main
 					Vector.new(320,240), # pos
 					Vector.new(0,0),     # vel
 					0,	                 # angle
-					Vector.new(1,0),     # accel
+					Vector.new(4,0),     # accel
 					1)	                 # spin
 
 	$sprites = UpdateGroup.new()
@@ -81,20 +81,20 @@ def main
 					when Rubygame::K_SPACE
 						$ship.report()
 					when Rubygame::K_LEFT
-						$ship.start_rotate_left()
+						$ship.start_thrust_acw()
 					when Rubygame::K_RIGHT
-						$ship.start_rotate_right()
+						$ship.start_thrust_cw()
 					when Rubygame::K_UP
-						$ship.start_thrust()
+						$ship.start_thrust_aft()
 					end
 				when Rubygame::KeyUpEvent # key is released
 					case event.key
 					when Rubygame::K_LEFT
-						$ship.stop_rotate()
+						$ship.stop_thrust_acw()
 					when Rubygame::K_RIGHT
-						$ship.stop_rotate()
+						$ship.stop_thrust_cw()
 					when Rubygame::K_UP
-						$ship.stop_thrust()
+						$ship.stop_thrust_aft()
 					end
 				end             # end case event
 			end	                # end each
