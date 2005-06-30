@@ -140,6 +140,10 @@ class Ship
 		t = t / 1000.0			# convert to seconds
 
 		unless @avel == 0
+			unless @a == [0,0]
+				@a.set!(@accel.rotate(@angle))
+				stamp()
+			end
 			@angle = @base_angle + @avel * t
 			angle = rad2deg(-@angle)
 			@image = Rubygame::Transform.rotozoom(@base_image,angle,1)
