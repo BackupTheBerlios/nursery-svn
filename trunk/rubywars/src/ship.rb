@@ -82,9 +82,14 @@ class Ship
 			:cw => 0,		# causes clockwise rotation.
 			:acw => 0,		# causes anti-clockwise rotation.
 		}
+
+		now = Rubygame::Time.get_ticks()
+		@stamp = {
+			:p => now,			# last time position was stamped
+			:a => now			# last time angle was stamped
+		}
 		
-		@t = Rubygame::Time.get_ticks()
-		stamp()					# set initial position and velocity
+		stamp_pos()					# set initial position and velocity
 
 		@image = image
 		@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
@@ -93,7 +98,7 @@ class Ship
 
 	def draw(surf)
 		super
-		0.upto(20) do |t|
+		0.upto(10) do |t|
 			v = project(t)
 			surf.fill([250-(t*10)]*3, # darkening grayscale
 					  [v.x-2, v.y-2, 2, 2]) # square around point
@@ -103,13 +108,18 @@ class Ship
 	# Set the "initial" position and velocity to current values.
 	# This is called when the Ship's acceleration changes, or when the old
 	# position model is otherwise made obsolete. 
-	def stamp
+	def stamp_pos
 		now = Rubygame::Time.get_ticks()
-		t = (now - @t)/1000.0
+		t = (now - @stamp[:p])/1000.0
 		@pos.set!( project(t) )
 		@vel.set!( project_vel(t) )
+		@stamp[:p] = now
+	end
+
+	def stamp_angle
+		now = Rubygame::Time.get_ticks()
 		@base_angle = @angle
-		@t = now
+		@stamp[:a] = now
 	end
 
 	# Predict where the Ship will be +t+ milliseconds after initialization, if
@@ -125,10 +135,17 @@ class Ship
 						  @pos.y + @vel.y*t + @a.y*t2)
 	end
 
+	# Predict what the Ship's velocity will be +t+ milliseconds after 
+	# initialization, if it maintains its current acceleration.
+	def project_vel(t)
+		return Vector.new(@vel.x + @a.x*t,
+						  @vel.y + @a.y*t)
+	end
+
 	# Print the ship's angle and the formula being used to project
 	# position. For debugging purposes and curious people.
 	def report()
-		t = (Rubygame::Time.get_ticks() - @t)/1000.0
+		t = (Rubygame::Time.get_ticks() - @stamp[:accel])/1000.0
 		t2 = t*t/2 # one half t-squared
 		v = Vector.new(@pos.x + @vel.x*t + @a.x*t2,
 						  @pos.y + @vel.y*t + @a.y*t2)
@@ -139,19 +156,12 @@ class Ship
 	# Recalculate the angle of acceleration of the ship, e.g. when
 	# the ship rotates.
 	def recalc_accel()
-		stamp()
+		stamp_pos()
 		if @thrust[:aft] > 0
 			@a.set!(@accel.rotate(@angle))
 		else
 			@a.set!(0,0)
 		end
-	end
-
-	# Predict what the Ship's velocity will be +t+ milliseconds after 
-	# initialization,
-	def project_vel(t)
-		return Vector.new(@vel.x + @a.x*t,
-						  @vel.y + @a.y*t)
 	end
 
 	# Returns true if the ship is rotating in either direction.
@@ -180,11 +190,15 @@ class Ship
 		# incremental models when viewed from the outside.
 
 		now = Rubygame::Time.get_ticks()
-		t = now - @t			# how long since last stamp()
-		t = t / 1000.0			# convert to seconds
+		# how long since last stamp_pos(), in seconds.
+		ptime = (now - @stamp[:p])/1000.0
+
 
 		if spinning?()
-			@angle = @base_angle + @spin * net_spin() * t
+			# how long since last stamp_angle(), in seconds.
+			atime = (now - @stamp[:a])/1000.0
+			
+			@angle = @base_angle + @spin * net_spin() * atime
 
 			unless @a == [0,0]
 				recalc_accel()
@@ -195,18 +209,20 @@ class Ship
 			@rect = Rubygame::Rect.new( [0,0].concat(@image.size) )
 		end
 
-		p = project(t).to_a
+		p = project(ptime).to_a
 		@rect.center = p
 	end
 
 	# Begin rotating anti-clockwise.
 	def start_thrust_acw
 		@thrust[:acw] += 1
+		stamp_angle()
 	end
 
 	# Begin rotating clockwise.
 	def start_thrust_cw
 		@thrust[:cw] += 1
+		stamp_angle()
 	end
 
 	# Stop rotating anti-clockwise.
