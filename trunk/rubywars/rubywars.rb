@@ -78,8 +78,10 @@ def main
 					case event.key
 					when Rubygame::K_Q, Rubygame::K_ESCAPE
 						throw :quit
-					when Rubygame::K_SPACE
+					when Rubygame::K_RETURN
 						$ship.report()
+					when Rubygame::K_SPACE
+						$ship.shoot()
 					when Rubygame::K_LEFT
 						$ship.start_thrust_acw()
 					when Rubygame::K_RIGHT
