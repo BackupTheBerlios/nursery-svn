@@ -40,6 +40,7 @@ class Projectile
 	def vy=(v); @vel.y=(v); end
 	
 	attr_accessor :angle
+	attr_accessor :stamp
 
 	# Create a new Projectile.
 	# 
