@@ -11,9 +11,10 @@ require 'src/vector'
 
 class Launcher
 
-	def initialize(parent, type)
+	def initialize(parent, type, spawnedLifespan)
 		@parent = parent
-		@bulletType = type
+		@type = type
+		@lifespan = spawnedLifespan
 	end
 
         def shoot
@@ -21,7 +22,7 @@ class Launcher
                 v = Vector.new(1,0).rotate(@parent.angle)
                 v.magnitude += 150
                 p = @parent.project(t)
-                @groups[0].push(@type.new(p,v,1000))
+                @groups[0].push(@type.new(p,v,lifespan))
         end
 
 end
