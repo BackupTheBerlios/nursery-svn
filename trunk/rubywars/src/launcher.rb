@@ -11,8 +11,9 @@ require 'src/vector'
 
 class Launcher
 
-	def initialize(parent)
+	def initialize(parent, type)
 		@parent = parent
+		@bulletType = type
 	end
 
         def shoot
@@ -20,7 +21,7 @@ class Launcher
                 v = Vector.new(1,0).rotate(@parent.angle)
                 v.magnitude += 150
                 p = @parent.project(t)
-                @groups[0].push(Bullet.new(p,v,1000))
+                @groups[0].push(@type.new(p,v,1000))
         end
 
 end
