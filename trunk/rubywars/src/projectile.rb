@@ -129,7 +129,7 @@ class Projectile
 	# Print the ship's angle and the formula being used to project
 	# position. For debugging purposes and curious people.
 	def report()
-		t = (Rubygame::Time.get_ticks() - @stamp[:accel])/1000.0
+		t = (Rubygame::Time.get_ticks() - @stamp[:p])/1000.0
 		t2 = t*t/2 # one half t-squared
 		v = Vector.new(@pos.x + @vel.x*t + @a.x*t2,
 						  @pos.y + @vel.y*t + @a.y*t2)
