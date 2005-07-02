@@ -19,7 +19,7 @@ class Bullet < Projectile
 		image= Rubygame::Surface.new([2,2])
 		image.fill([250,250,100])
 		# super(image,pos,vel,angle,accel,spin)
-		super(image,pos,vel,0,Vector.new(0,0),0)
+		super(image,pos,vel)
 		@born = Rubygame::Time.get_ticks()
 		@life = life
 	end

@@ -7,11 +7,11 @@
 
 # Goal: the ship can 'shoot' projectile bullets in the direction it's facing.
 
-require 'src/projectile'
+require 'src/rocket'
 require 'src/bullet'
 require 'rubygame'
 
-class Ship < Projectile
+class Ship < Rocket
 	def draw(surf)
 		super
 		0.upto(10) do |t|
