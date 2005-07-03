@@ -9,6 +9,8 @@
 
 require 'rubygame'
 require 'src/ship'
+require 'src/launcher'
+require 'src/bullet'
 
 Rubygame.init()
 
@@ -47,6 +49,7 @@ def main
 					0,	                 # angle
 					Vector.new(4,0),     # accel
 					1)	                 # spin
+	$ship.add_launcher(Launcher,Bullet,1000)
 
 	$sprites = UpdateGroup.new()
 	$sprites.push($ship)

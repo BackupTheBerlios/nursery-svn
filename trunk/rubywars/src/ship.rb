@@ -5,13 +5,20 @@
 # Rubywars (working title) --  A scrolling space shooter game
 # Copyright (C) Greg Colombo, John Croisant 2005
 
-# Goal: the ship can 'shoot' projectile bullets in the direction it's facing.
-
 require 'src/rocket'
-require 'src/bullet'
 require 'rubygame'
 
 class Ship < Rocket
+	def initialize(*args)
+		super
+		@launch = []
+	end
+
+
+	# Draw the ship using the default Rubygame Sprite draw() method.
+	# Additionally, several points are drawn, which show the Ship's
+	# projected location at integer times 0-10 (seconds) after last
+	# #stamp_pos().
 	def draw(surf)
 		super
 		0.upto(10) do |t|
@@ -21,11 +28,19 @@ class Ship < Rocket
 		end
 	end
 
+	# Create and "attach" a new Launcher instance to the Ship.
+	# 
+	# +klass+:: the class of Launcher to create.
+	# +*args+:: arguments to pass to +klass.new()+ (e.g. lifespan)
+	def add_launcher(klass,*args)
+		@launch << klass.new(self,*args)
+	end
+
+	# Iterate through all Launchers attached to the Ship, and shoot
+	# each of them.
 	def shoot
-		t = (Rubygame::Time.get_ticks() - @stamp[:p])/1000.0
-		v = Vector.new(1,0).rotate(@angle)
-		v.magnitude += 150
-		p = project(t)
-		@groups[0].push(Bullet.new(p,v,1000))
+		@launch.each do |l|
+			l.shoot()
+		end
 	end
 end
