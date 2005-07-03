@@ -62,6 +62,12 @@ class Rocket < Projectile
 		super(image,pos,vel)
 	end
 
+	# Set the current time and angle to be considered the initial state
+	# for all further angle-related calculations (until this method is
+	# called again).
+	# 
+	# This should be called whenever the Rocket's rotation rate changes,
+	# e.g. it changes directions or stops.
 	def stamp_angle
 		now = Rubygame::Time.get_ticks()
 		@base_angle = @angle
