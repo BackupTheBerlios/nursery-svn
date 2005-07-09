@@ -6,13 +6,25 @@
 # Copyright (C) Greg Colombo, John Croisant 2005
 
 require 'socket'
+require 'src/game_event'
 
-# Class `Player' represents a human player with a corresponding Ship object,
-# name, and Internet Protocol address. Events are forwarded to the Player
-# from Netman.
-class Player
-	attr_accessor :name, :addy, :ship
-end
+# Network overview:
+# 
+#  Sending events:
+#    1. Hardware events occur (e.g. keyboard press)
+#    2. Hardware event is translated into game event (e.g. ship1 accelerates)
+#    3. Game event is passed to Netman
+#    4. Game event is converted to a string
+#    5. Netman sends string to other clients across the network.
+#    6. Netman passes event to the game object it describes.
+#    7. Game object uses event to update state.
+# 
+#  Receiving events:
+#    1. Netman receives string from across network.
+#    2. String is translated into game event.
+#    3. Netman passes event to the game object it describes.
+#    4. Game object uses event to update state.
+# 
 
 # Networking Manager (Netman)
 # 
@@ -27,15 +39,19 @@ end
 # via the network will be sent to the local objects they describe.
 class Netman
 	def initialize
+		@connects = []			# TCP connections with other clients
 		@queue = []				# game events are stored here
 		@objects = {}			# hash of game objects by identifier number
 		@locals = {}			# hash of local game objects by ID number
 	end
 
-	# Add an event to the queue. All events in the queue will be processed
-	# at the next #flush call.
-	def tell(ev)
-		@queue << ev
+	# Deliver the given game event to its corresponding game object.
+	def deliver(ev)
+		begin
+			lookup(ev.object).tell(ev)
+		rescue NoMethodError
+			puts "Netman: I don't know of a game object with ID: #{ev.object}"
+		end
 	end
 
 	# Iterate through all events in the queue, and deliver them to
@@ -56,19 +72,11 @@ class Netman
 		@queue = []
 	end
 
-	# Deliver the given game event to its corresponding game object.
-	def deliver(ev)
-		begin
-			lookup(ev.object).tell(ev)
-		rescue NoMethodError
-			puts "Netman: I don't know of a game object with ID: #{ev.object}"
-		end
-	end
-
-	# Return a reference to the game object corresponding to the given
-	# ID number.
-	def lookup(id)
-		@objects[id]
+	# Generate a random integer in 0..10000. If an object with that
+	# ID number exists, choose another random integer.
+	def generate_object_id()
+		(id = rand(10000)) until @objects[id] == nil
+		return id
 	end
 
 	# Return true if the object corresponding to the given ID number is
@@ -77,7 +85,43 @@ class Netman
 		@locals[id] != nil
 	end
 
+	# Return a reference to the game object corresponding to the given
+	# ID number.
+	def lookup(id)
+		@objects[id]
+	end
+
+	# Make a TCP connection with the given Internet Protocol address and port
+	def make_connect(address,port)
+#		c = Connection.new()
+		@connects << c
+	end
+
 	# Send the event to remote clients across the network.
-	def put_network
+	def put_network(ev)
+		@connects.each do |c|
+			c.puts(ev.to_net)
+		end
+	end
+
+	# Register a locally-created object and send an event over the net.
+	def register_local(obj)
+		id = generate_id()
+		@locals[id] = obj
+		register_object(obj,id)
+		put_network( NewObjectEvent(id,obj) )
+	end
+
+	# Register the given game object under the given integer ID
+	def register_object(obj,id)
+		unless @objects[id]
+			@objects[id] = obj
+		end
+	end
+
+	# Add an event to the queue. All events in the queue will be processed
+	# at the next #flush call.
+	def tell(ev)
+		@queue << ev
 	end
 end
