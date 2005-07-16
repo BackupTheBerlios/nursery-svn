@@ -8,6 +8,7 @@
 # Copyright (C) Greg Colombo, John Croisant 2005
 
 require 'rubygame'
+require 'src/input'
 require 'src/ship/ship'
 require 'src/launcher'
 require 'src/bullet'
@@ -25,9 +26,10 @@ def main
 
 	$screen = Rubygame::Display.set_mode([640,480])
 	$screen.set_caption("Rubywars")
-	$queue = Rubygame::Queue.instance()
+
 	$clock = Rubygame::Time::Clock.new()
 #	$clock.desired_mspf = 1
+
 
 	$background = Rubygame::Surface.new($screen.size)
 	$background.fill([0,0,0])
@@ -51,6 +53,24 @@ def main
 					1)	                 # spin
 	$ship.add_launcher(Launcher,Bullet,1000)
 
+	# when Rubygame::K_Q, Rubygame::K_ESCAPE
+	#	throw :quit
+	$input = InputHandler.new()
+	$input.bind_many(
+					 # bind to key press
+					 [Rubygame::K_RETURN, $ship, ReportEvent],
+					 [Rubygame::K_SPACE,  $ship, ShootEvent],
+					 [Rubygame::K_LEFT,   $ship, ThrustACWEvent],
+					 [Rubygame::K_RIGHT,  $ship, ThrustCWEvent],
+					 [Rubygame::K_UP,     $ship, ThrustAftEvent],
+
+					 # bind to key release
+					 [-(Rubygame::K_LEFT),  $ship, StopThrustACWEvent],
+					 [-(Rubygame::K_RIGHT), $ship, StopThrustCWEvent],
+					 [-(Rubygame::K_UP),    $ship, StopThrustAftEvent]
+	)
+	puts $input.bindings.inspect
+
 	$sprites = UpdateGroup.new()
 	$sprites.push($ship)
 											  
@@ -72,37 +92,7 @@ def main
 #   - Redraw/update relevant parts of screen
 	catch(:quit) do
 		loop do
-			$queue.get.each do |event|
-				# Later, we'll want to make a general event processing model
-				case event
-				when Rubygame::QuitEvent
-					throw :quit
-				when Rubygame::KeyDownEvent	# key is pressed
-					case event.key
-					when Rubygame::K_Q, Rubygame::K_ESCAPE
-						throw :quit
-					when Rubygame::K_RETURN
-						$ship.report()
-					when Rubygame::K_SPACE
-						$ship.tell(ShootEvent.new(0,0))
-					when Rubygame::K_LEFT
-						$ship.tell(ThrustACWEvent.new(0,0))
-					when Rubygame::K_RIGHT
-						$ship.tell(ThrustCWEvent.new(0,0))
-					when Rubygame::K_UP
-						$ship.tell(ThrustAftEvent.new(0,0))
-					end
-				when Rubygame::KeyUpEvent # key is released
-					case event.key
-					when Rubygame::K_LEFT
-						$ship.tell(StopThrustACWEvent.new(0,0))
-					when Rubygame::K_RIGHT
-						$ship.tell(StopThrustCWEvent.new(0,0))
-					when Rubygame::K_UP
-						$ship.tell(StopThrustAftEvent.new(0,0))
-					end
-				end             # end case event
-			end	                # end each
+			$input.update()
 
 			$sprites.undraw($screen,$background)
 

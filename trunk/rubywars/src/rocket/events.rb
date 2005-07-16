@@ -9,7 +9,11 @@ require 'src/events.rb'
 
 class ThrustACWEvent     < GenericEvent; end
 class StopThrustACWEvent < GenericEvent; end
+
 class ThrustCWEvent      < GenericEvent; end
 class StopThrustCWEvent  < GenericEvent; end
+
 class ThrustAftEvent     < GenericEvent; end
 class StopThrustAftEvent < GenericEvent; end
+
+class ReportEvent        < GenericEvent; end

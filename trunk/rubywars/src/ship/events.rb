@@ -8,3 +8,4 @@
 require 'src/events.rb'
 
 class ShootEvent < GenericEvent; end
+class ReportEvent < GenericEvent; end
