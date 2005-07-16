@@ -5,6 +5,7 @@
 # Rubywars (working title) --  A scrolling space shooter game
 # Copyright (C) Greg Colombo, John Croisant 2005
 
+require 'src/rocket/events.rb'
 require 'src/projectile'
 require 'rubygame'
 
@@ -159,6 +160,23 @@ class Rocket < Projectile
 		end
 
 		super
+	end
+
+	def tell(ev)
+		case ev
+		when ThrustACWEvent
+			start_thrust_acw()
+		when StopThrustACWEvent
+			stop_thrust_acw()
+		when ThrustCWEvent
+			start_thrust_cw()
+		when StopThrustCWEvent
+			stop_thrust_cw()
+		when ThrustAftEvent
+			start_thrust_aft()
+		when StopThrustAftEvent
+			stop_thrust_aft()
+		end
 	end
 
 	# Begin rotating anti-clockwise.

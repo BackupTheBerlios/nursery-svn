@@ -8,7 +8,7 @@
 # Copyright (C) Greg Colombo, John Croisant 2005
 
 require 'rubygame'
-require 'src/ship'
+require 'src/ship/ship'
 require 'src/launcher'
 require 'src/bullet'
 
@@ -84,22 +84,22 @@ def main
 					when Rubygame::K_RETURN
 						$ship.report()
 					when Rubygame::K_SPACE
-						$ship.shoot()
+						$ship.tell(ShootEvent.new(0,0))
 					when Rubygame::K_LEFT
-						$ship.start_thrust_acw()
+						$ship.tell(ThrustACWEvent.new(0,0))
 					when Rubygame::K_RIGHT
-						$ship.start_thrust_cw()
+						$ship.tell(ThrustCWEvent.new(0,0))
 					when Rubygame::K_UP
-						$ship.start_thrust_aft()
+						$ship.tell(ThrustAftEvent.new(0,0))
 					end
 				when Rubygame::KeyUpEvent # key is released
 					case event.key
 					when Rubygame::K_LEFT
-						$ship.stop_thrust_acw()
+						$ship.tell(StopThrustACWEvent.new(0,0))
 					when Rubygame::K_RIGHT
-						$ship.stop_thrust_cw()
+						$ship.tell(StopThrustCWEvent.new(0,0))
 					when Rubygame::K_UP
-						$ship.stop_thrust_aft()
+						$ship.tell(StopThrustAftEvent.new(0,0))
 					end
 				end             # end case event
 			end	                # end each

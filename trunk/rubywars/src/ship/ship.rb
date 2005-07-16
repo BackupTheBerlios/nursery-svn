@@ -5,7 +5,8 @@
 # Rubywars (working title) --  A scrolling space shooter game
 # Copyright (C) Greg Colombo, John Croisant 2005
 
-require 'src/rocket'
+require 'src/rocket/rocket'
+require 'src/ship/events'
 require 'rubygame'
 
 class Ship < Rocket
@@ -41,6 +42,15 @@ class Ship < Rocket
 	def shoot
 		@launch.each do |l|
 			l.shoot()
+		end
+	end
+
+	def tell(ev)
+		case ev 
+		when ShootEvent
+			shoot()
+		else
+			super(ev)
 		end
 	end
 end
