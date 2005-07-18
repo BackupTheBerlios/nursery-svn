@@ -52,6 +52,10 @@ class Projectile
 		@rect.center = @pos.x.to_i, @pos.y.to_i
 	end
 
+	def inspect
+		"#<#{self.class}:#{self.object_id} [%0.3f, %0.3f]"%[@pos.x,@pos.y]
+	end
+
 	# Set the "initial" position and velocity to current values.
 	# This is called when the Ship's acceleration changes, or when the old
 	# position model is otherwise made obsolete. 

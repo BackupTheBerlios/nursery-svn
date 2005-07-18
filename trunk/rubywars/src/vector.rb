@@ -78,11 +78,11 @@ class Vector
 	end
 
 	def to_s
-		"#<#{self.class}: #{@x}, #{@y}>"
+		"#<#{self.class}: %0.3f, %0.3f>"%[@x,@y]
 	end
 
 	def inspect
-		"#<#{self.class}:#{self.object_id}: #{@x}, #{@y}>"
+		"#<#{self.class}:#{self.object_id}: %0.3f, %0.3f>"%[@x,@y]
 	end
 
 	def to_a
