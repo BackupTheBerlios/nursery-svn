@@ -163,26 +163,25 @@ class Rocket < Projectile
 	end
 
 	def tell(ev)
-		case ev
+		case ev.sig
 
-		when ThrustACWEvent
-			start_thrust_acw()
-		when StopThrustACWEvent
-			stop_thrust_acw()
-
-		when ThrustCWEvent
-			start_thrust_cw()
-		when StopThrustCWEvent
-			stop_thrust_cw()
-
-		when ThrustAftEvent
-			start_thrust_aft()
-		when StopThrustAftEvent
-			stop_thrust_aft()
-
-		when ReportEvent
+		when :report
 			report()
 
+		when :thrust_acw
+			start_thrust_acw()
+		when :nothrust_acw
+			stop_thrust_acw()
+
+		when :thrust_cw
+			start_thrust_cw()
+		when :nothrust_cw
+			stop_thrust_cw()
+
+		when :thrust_aft
+			start_thrust_aft()
+		when :nothrust_aft
+			stop_thrust_aft()
 		end
 	end
 

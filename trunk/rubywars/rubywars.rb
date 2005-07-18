@@ -43,20 +43,20 @@ def main
 
 		input.bind_many(
 						# bind to key press
-						[Rubygame::K_RETURN,   ship, ReportEvent],
-						[Rubygame::K_SPACE,    ship, ShootEvent],
-						[Rubygame::K_LEFT,     ship, ThrustACWEvent],
-						[Rubygame::K_RIGHT,    ship, ThrustCWEvent],
-						[Rubygame::K_UP,       ship, ThrustAftEvent],
+						[Rubygame::K_RETURN,   ship, :report],
+						[Rubygame::K_SPACE,    ship, :shoot],
+						[Rubygame::K_LEFT,     ship, :thrust_acw],
+						[Rubygame::K_RIGHT,    ship, :thrust_cw],
+						[Rubygame::K_UP,       ship, :thrust_aft],
 
 						# bind to key release
-						[-(Rubygame::K_LEFT),  ship, StopThrustACWEvent],
-						[-(Rubygame::K_RIGHT), ship, StopThrustCWEvent],
-						[-(Rubygame::K_UP),    ship, StopThrustAftEvent],
+						[-(Rubygame::K_LEFT),  ship, :nothrust_acw],
+						[-(Rubygame::K_RIGHT), ship, :nothrust_cw],
+						[-(Rubygame::K_UP),    ship, :nothrust_aft],
 
 						# system events
-						[Rubygame::K_Q,        1,    QuitEvent],
-						[Rubygame::K_ESCAPE,   1,    QuitEvent]
+						[Rubygame::K_Q,        1,    :quit],
+						[Rubygame::K_ESCAPE,   1,    :quit]
 						)
 	end
 

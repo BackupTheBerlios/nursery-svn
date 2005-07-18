@@ -46,8 +46,8 @@ class Ship < Rocket
 	end
 
 	def tell(ev)
-		case ev 
-		when ShootEvent
+		case ev.sig
+		when :shoot
 			shoot()
 		else
 			super(ev)

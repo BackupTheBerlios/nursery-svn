@@ -9,6 +9,12 @@ require 'rubygame'
 require 'src/input'
 require 'src/events'
 
+# Class Game is responsible for coordinating all game behavior.
+# Game maintains a list of 
+# 
+# Input handling is delegated to an InputHandler instance.
+# 
+# 
 class Game
 	# Attr_accessors should eventually be removed/replaced.
 	attr_accessor :sprites, :input
@@ -34,8 +40,9 @@ class Game
 		@sprites.extend Rubygame::Sprite::UpdateGroup
 
 		# hash of game objects by ID.
-		# IDs 1 to 999 are reserved for system objects.
-		# Normal objects are integers from 1000 to 10,000 (usually random).
+		# IDs 1 to 999 are reserved for local system objects.
+		# Normal/networked objects are given integers from 1000
+		# to 10,000 (usually chosen randomly).
 		@objects = {1 => self, 2 => @input}
 
 		if block_given?
@@ -93,6 +100,10 @@ class Game
 		end
 	end
 
+	def disassociate(id)
+		@objects.delete(id)
+	end
+
 	def flush()
 		@queue.each do |ev|
 			self.deliver(ev)
@@ -128,8 +139,8 @@ class Game
 
 	# Tell the Game about a game event.
 	def tell(ev)
-		case(ev)
-		when QuitEvent
+		case ev.sig
+		when :quit
 			throw :quit
 		end
 	end

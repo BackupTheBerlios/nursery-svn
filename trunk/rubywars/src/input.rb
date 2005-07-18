@@ -18,14 +18,15 @@ class InputHandler
 
 	# Bind the given key to an object and event class. When #handle
 	# is called with +key+, +obj.tell+ will be called with an instance
-	# of +eklass+.
+	# of Signal. The remaining arguments will be passed to Signal#new,
+	# after the two required arguments, object ID and current time.
 	# 
 	# To bind an event to the _release_ of a key, bind to the opposite
 	# (negative) of the key value.
 	#
 	# See also #bind_many
-	def bind(key,obj,eklass)
-		@bindings[key] = [obj,eklass]
+	def bind(key,obj,*args)
+		@bindings[key] = [obj,*args]
 	end
 
 	# Bind many keys at once. +*args+ must be an Array of many sub-Arrays;
@@ -42,7 +43,7 @@ class InputHandler
 	def handle(key, t)
 		b = @bindings[key]
 		if b
-			@game.post( b[1].new( b[0], t))
+			@game.post(SignalEvent.new( b[0], t, *b[1]))
 			true
 		else
 			nil
@@ -60,11 +61,13 @@ class InputHandler
 		@queue.get.each do |event|
 			case event
 			when Rubygame::QuitEvent
-				@game.post(QuitEvent.new(1,t))
+				@game.post(SignalEvent.new(1,t,:quit))
+
 			when Rubygame::KeyDownEvent	# key is pressed
 				unless handle(event.key, t)
 					#warn "No binding for key #{event.key}"
 				end
+
 			when Rubygame::KeyUpEvent	# key is released
 				unless handle(-(event.key), t)
 					#warn "No binding for key #{-(event.key)}"
