@@ -8,6 +8,8 @@
 # Copyright (C) Greg Colombo, John Croisant 2005
 
 require 'rubygame'
+require 'src/game'
+require 'src/events'
 require 'src/input'
 require 'src/ship/ship'
 require 'src/launcher'
@@ -15,65 +17,48 @@ require 'src/bullet'
 
 Rubygame.init()
 
-class UpdateGroup < Rubygame::Sprite::Group
-	include Rubygame::Sprite::UpdateGroup
-end
-
 def main
 
-	# For now this is just a test, so we can do dirty stuff like
-	# use global variables. We MIGHT want to change this later.
+	$game = Game.new() do
+		|game,input|
 
-	$screen = Rubygame::Display.set_mode([640,480])
-	$screen.set_caption("Rubywars")
+		# Generate ship image, a white triangle inside a gray triangle
+		image = Rubygame::Surface.new([50,50])
+		Rubygame::Draw.filled_polygon(image,
+									  [[0,0],[50,25],[0,50],[0,0]],
+									  [150,150,150])
+		Rubygame::Draw.filled_polygon(image,
+									  [[35,20],[45,25],[35,30],[35,20]],
+									  [250,250,250])
 
-	$clock = Rubygame::Time::Clock.new()
-#	$clock.desired_mspf = 1
+		ship = Ship.new(image,               # surface
+						Vector.new(320,240), # pos
+						Vector.new(0,0),     # vel
+						0,	                 # angle
+						Vector.new(10,0),     # accel
+						1)	                 # spin
+		ship.add_launcher(Launcher,Bullet,1000)
 
+		ship = game.associate_sprite(ship) # ID number
 
-	$background = Rubygame::Surface.new($screen.size)
-	$background.fill([0,0,0])
+		input.bind_many(
+						# bind to key press
+						[Rubygame::K_RETURN,   ship, ReportEvent],
+						[Rubygame::K_SPACE,    ship, ShootEvent],
+						[Rubygame::K_LEFT,     ship, ThrustACWEvent],
+						[Rubygame::K_RIGHT,    ship, ThrustCWEvent],
+						[Rubygame::K_UP,       ship, ThrustAftEvent],
 
-	$image = Rubygame::Surface.new([50,50])
-	# Grey body
-	Rubygame::Draw.filled_polygon($image,
-								  [[0,0],[50,25],[0,50],[0,0]],
-								  [150,150,150])
-	# White tip
-	Rubygame::Draw.filled_polygon($image,
-								  [[35,20],[45,25],[35,30],[35,20]],
-								  [250,250,250])
+						# bind to key release
+						[-(Rubygame::K_LEFT),  ship, StopThrustACWEvent],
+						[-(Rubygame::K_RIGHT), ship, StopThrustCWEvent],
+						[-(Rubygame::K_UP),    ship, StopThrustAftEvent],
 
-
-	$ship = Ship.new($image,             # surface
-					Vector.new(320,240), # pos
-					Vector.new(0,0),     # vel
-					0,	                 # angle
-					Vector.new(4,0),     # accel
-					1)	                 # spin
-	$ship.add_launcher(Launcher,Bullet,1000)
-
-	# when Rubygame::K_Q, Rubygame::K_ESCAPE
-	#	throw :quit
-	$input = InputHandler.new()
-	$input.bind_many(
-					 # bind to key press
-					 [Rubygame::K_RETURN, $ship, ReportEvent],
-					 [Rubygame::K_SPACE,  $ship, ShootEvent],
-					 [Rubygame::K_LEFT,   $ship, ThrustACWEvent],
-					 [Rubygame::K_RIGHT,  $ship, ThrustCWEvent],
-					 [Rubygame::K_UP,     $ship, ThrustAftEvent],
-
-					 # bind to key release
-					 [-(Rubygame::K_LEFT),  $ship, StopThrustACWEvent],
-					 [-(Rubygame::K_RIGHT), $ship, StopThrustCWEvent],
-					 [-(Rubygame::K_UP),    $ship, StopThrustAftEvent]
-	)
-	puts $input.bindings.inspect
-
-	$sprites = UpdateGroup.new()
-	$sprites.push($ship)
-											  
+						# system events
+						[Rubygame::K_Q,        1,    QuitEvent],
+						[Rubygame::K_ESCAPE,   1,    QuitEvent]
+						)
+	end
 
 # Basic overview of (finished) game loop:
 #   - Each object checks if armor < 1. If so, it dies.
@@ -92,27 +77,9 @@ def main
 #   - Redraw/update relevant parts of screen
 	catch(:quit) do
 		loop do
-			$input.update()
-
-			$sprites.undraw($screen,$background)
-
-			# Update ship's position. The value of $clock.tick is
-			# actually ignored by the ship (in this case), but it has the
-			# side-effect of delaying execution.
-
-			$sprites.update($clock.tick())
-
-			# Draw the ship to the screen. It will leave a 'tail' for now.
-			$sprites.draw($screen)
-
-			# Refresh the display window.
-			$screen.update()
-			$screen.set_caption("Rubywars [#{$clock.fps} fps]")
-			
-
+			$game.update()
 		end                     # end loop
 	end                         # end catch
-
 end                             # end def
 
 #this calls the 'main' function when this script is executed
