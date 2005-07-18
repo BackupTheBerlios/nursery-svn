@@ -16,7 +16,7 @@ class GenericEvent
 	end
 
 	def to_net
-		"Generic(#{@id})"
+		"#{self.class}(#{@id})"
 	end
 end
 
@@ -34,5 +34,8 @@ class NewObjectEvent < GenericEvent
 	def to_net
 		"NewObject(#{@id},#{@obj.to_net})"
 	end
+end
+
+class QuitEvent < GenericEvent
 end
 
