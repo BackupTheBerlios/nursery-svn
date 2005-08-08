@@ -5,6 +5,7 @@
 # Rubywars (working title) --  A scrolling space shooter game
 # Copyright (C) Greg Colombo, John Croisant 2005
 
+# A generic Event class, meant to be subclassed.
 class GenericEvent
 	attr_reader :id, :t
 
@@ -20,6 +21,24 @@ class GenericEvent
 	end
 end
 
+# Send the given game signal (usually a :symbol) to an object.
+# How the object behaves in response to a signal is left to
+# the object to decide.
+class SignalEvent < GenericEvent
+	attr_reader :sig
+	attr_reader :extra
+	def initialize(id,t,sig,*extra)
+		super(id,t)
+		@sig = sig
+		@extra = extra
+	end
+
+	def to_net
+		"Signal(#{@id},#{@sig.to_s})"
+	end
+end
+
+# A new object has been created and assigned an ID number.
 class NewObjectEvent < GenericEvent
 	attr_reader :obj
 
@@ -36,6 +55,8 @@ class NewObjectEvent < GenericEvent
 	end
 end
 
+# The game should quit
 class QuitEvent < GenericEvent
 end
+
 
