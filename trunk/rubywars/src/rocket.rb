@@ -5,7 +5,6 @@
 # Rubywars (working title) --  A scrolling space shooter game
 # Copyright (C) Greg Colombo, John Croisant 2005
 
-require 'src/rocket/events.rb'
 require 'src/projectile'
 require 'rubygame'
 
