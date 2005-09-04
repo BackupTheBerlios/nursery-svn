@@ -11,7 +11,7 @@ require 'rubygame'
 require 'src/game'
 require 'src/events'
 require 'src/input'
-require 'src/ship/ship'
+require 'src/ship'
 require 'src/launcher'
 require 'src/bullet'
 
@@ -23,15 +23,9 @@ def main
 		|game,input|
 
 		# Generate ship image, a white triangle inside a gray triangle
-		image = Rubygame::Surface.new([50,50])
-		Rubygame::Draw.filled_polygon(image,
-									  [[0,0],[50,25],[0,50],[0,0]],
-									  [150,150,150])
-		Rubygame::Draw.filled_polygon(image,
-									  [[35,20],[45,25],[35,30],[35,20]],
-									  [250,250,250])
+		game.bag[:ship] = "data/ship1.png"
 
-		ship = Ship.new(image,               # surface
+		ship = Ship.new(game.bag[:ship],               # surface
 						Vector.new(320,240), # pos
 						Vector.new(0,0),     # vel
 						0,	                 # angle

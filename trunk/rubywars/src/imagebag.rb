@@ -40,12 +40,12 @@ class ImageBag
 			unless force
 				return @images[key]
 			else
-				return @images[key] = load_image(path)
+				return @images[key] = load_image(key)
 			end
 		when String
 			return self.[](@images[key])
 		when nil
-			return @images[key] = load_image(path)
+			return @images[key] = load_image(key)
 		end
 	end
 
